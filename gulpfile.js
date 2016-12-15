@@ -7,6 +7,8 @@ var gulpIf = require('gulp-if');
 var cssnano = require('gulp-cssnano');
 var del = require('del');
 var runSequence = require('run-sequence');
+var imagemin = require('gulp-imagemin');
+var cache = require('gulp-cache');
 
 gulp.task('watch', ['browserSync', 'sass'], function(){
   gulp.watch('www/SCSS/*.scss', ['sass']); 
@@ -40,11 +42,6 @@ gulp.task('useref', function(){
     .pipe(gulp.dest('dist'))
 })
 
-gulp.task('images', function(){
-  return gulp.src('www/image/**/*.+(png|jpg|gif|svg)')
-    .pipe(gulp.dest('dist/images'))
-})
-
 gulp.task('php', function(){
   return gulp.src('www/*.php')
     .pipe(gulp.dest('dist'))
@@ -53,6 +50,15 @@ gulp.task('php', function(){
 gulp.task('clean:dist', function() {
   return del.sync('dist');
 })
+
+gulp.task('images', function(){
+  return gulp.src('www/images/**/*.+(png|jpg|jpeg|gif|svg)')
+  // Caching images that ran through imagemin
+  .pipe(cache(imagemin({
+      interlaced: true
+    })))
+  .pipe(gulp.dest('dist/images'))
+});
 
 gulp.task('default', ['watch'])
 
